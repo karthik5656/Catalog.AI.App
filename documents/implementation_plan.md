@@ -61,7 +61,7 @@ Building an end-to-end, production-ready E-Commerce Merchandising & Catalog AI p
 ### 2. Backend: .NET 8 Core Microservices
 * **Architecture Pattern**: Clean Architecture (Domain, Application, Infrastructure, API layers).
 * **Communication**: REST APIs (external), MassTransit + RabbitMQ (async events), gRPC (internal service-to-service calls if needed).
-* **Data Access**: Entity Framework Core + Dapper (for high-performance vector queries).
+* **Data Access**: Entity Framework Core (Code-First Approach with `Pgvector.EntityFrameworkCore` for vector similarity search).
 
 ### 3. Docker Infrastructure (Local & Cloud Ready)
 * **`ollama`**: Containerized LLM runtime hosting `Llama-3.2-3B` or `Qwen2.5-1.5B`.
