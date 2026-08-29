@@ -2,9 +2,10 @@ name: CI/CD Pipeline - Unit Tests, Selective Docker Builds & GHCR Publishing
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ '**' ]
   pull_request:
-    branches: [ main, master ]
+    types: [opened, synchronize, reopened]
+    branches: [ '**' ]
 
 permissions:
   contents: read
@@ -141,7 +142,6 @@ jobs:
   publish-containers:
     name: Selective Docker Build & Push (GHCR)
     needs: [changes, test-backend, test-frontend]
-    # Run on main branch push or PRs if changes were detected
     if: always() && (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped') && (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
@@ -178,7 +178,7 @@ jobs:
         with:
           context: .
           file: src/backend/Gateway/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:latest
@@ -190,7 +190,7 @@ jobs:
         with:
           context: .
           file: src/backend/CatalogService/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:latest
@@ -202,7 +202,7 @@ jobs:
         with:
           context: .
           file: src/backend/AIWorkerService/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:latest
@@ -214,7 +214,7 @@ jobs:
         with:
           context: .
           file: src/backend/CatalogAssistantService/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:latest
@@ -226,7 +226,7 @@ jobs:
         with:
           context: ./src/frontend/shell
           file: src/frontend/shell/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:latest
@@ -238,7 +238,7 @@ jobs:
         with:
           context: ./src/frontend/catalog-mfe
           file: src/frontend/catalog-mfe/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:latest
@@ -250,7 +250,7 @@ jobs:
         with:
           context: ./src/frontend/copilot-mfe
           file: src/frontend/copilot-mfe/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:latest
@@ -262,7 +262,7 @@ jobs:
         with:
           context: ./src/frontend/catalog-assistant-mfe
           file: src/frontend/catalog-assistant-mfe/Dockerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:${{ env.IMAGE_TAG }}
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:latest
