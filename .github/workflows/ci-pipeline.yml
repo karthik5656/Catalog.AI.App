@@ -161,12 +161,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set Image Tag Environment
+      - name: Set Lowercase Repository Name & Image Tag
         run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_TAG="sha-${GITHUB_SHA::7}"
           if [ "${GITHUB_REF_NAME}" = "main" ] || [ "${GITHUB_REF_NAME}" = "master" ]; then
             IMAGE_TAG="latest"
           fi
+          echo "REPO_LOWER=${REPO_LOWER}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
       # --- 1. Gateway Microservice ---
@@ -178,8 +180,8 @@ jobs:
           file: src/backend/Gateway/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/gateway-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/gateway-service:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:latest
 
       # --- 2. Catalog Microservice ---
       - name: Build & Push Catalog Microservice Container
@@ -190,8 +192,8 @@ jobs:
           file: src/backend/CatalogService/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/catalog-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/catalog-service:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:latest
 
       # --- 3. AI Worker Microservice ---
       - name: Build & Push AI Worker Container
@@ -202,8 +204,8 @@ jobs:
           file: src/backend/AIWorkerService/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/ai-worker-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/ai-worker-service:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:latest
 
       # --- 4. Catalog Assistant RAG Microservice ---
       - name: Build & Push Catalog Assistant Service Container
@@ -214,8 +216,8 @@ jobs:
           file: src/backend/CatalogAssistantService/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/catalog-assistant-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/catalog-assistant-service:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:latest
 
       # --- 5. Shell MFE ---
       - name: Build & Push Shell MFE Container
@@ -226,8 +228,8 @@ jobs:
           file: src/frontend/shell/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/shell-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/shell-mfe:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:latest
 
       # --- 6. Vendor Catalog MFE ---
       - name: Build & Push Vendor Catalog MFE Container
@@ -238,8 +240,8 @@ jobs:
           file: src/frontend/catalog-mfe/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/vendor-catalog-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/vendor-catalog-mfe:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:latest
 
       # --- 7. Copilot MFE ---
       - name: Build & Push Copilot MFE Container
@@ -250,8 +252,8 @@ jobs:
           file: src/frontend/copilot-mfe/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/copilot-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/copilot-mfe:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:latest
 
       # --- 8. Catalog Assistant MFE ---
       - name: Build & Push Catalog Assistant MFE Container
@@ -262,5 +264,5 @@ jobs:
           file: src/frontend/catalog-assistant-mfe/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.REGISTRY }}/${{ github.repository }}/catalog-assistant-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ github.repository }}/catalog-assistant-mfe:latest
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:latest
