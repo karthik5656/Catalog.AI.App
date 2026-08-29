@@ -1,0 +1,41 @@
+name: GitHub Copilot & AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'documents/**'
+      - 'wireframes/**'
+      - '.gitignore'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  code-review:
+    name: Copilot AI Code Review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: GitHub Copilot / AI PR Code Review
+        uses: free-ai-code-reviewer/action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Optional custom prompt instructions for Copilot/AI reviewer:
+          instructions: |
+            You are a senior software architect reviewing a pull request for an E-Commerce Catalog AI platform built with .NET 10 microservices and React Micro-Frontends.
+            Please inspect the code for:
+            1. Clean Architecture compliance (.NET 10).
+            2. Potential performance bottlenecks or memory leaks.
+            3. Security vulnerabilities (input validation, JWT token safety).
+            4. React component state efficiency and proper TypeScript typing.
+            5. Clear suggestions and code improvement snippets.
