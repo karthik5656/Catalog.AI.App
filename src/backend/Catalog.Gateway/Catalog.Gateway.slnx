@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Catalog.Gateway.Domain/Catalog.Gateway.Domain.csproj" Id="9221bcae-6dbd-43fd-9e37-74aecaef572f" />
+  <Project Path="Catalog.Gateway.Infra/Catalog.Gateway.Infra.csproj" Id="e3ad1b24-ca1d-4253-ae12-78f9da62887b" />
+  <Project Path="Catalog.Gateway.API/Catalog.Gateway.API.csproj" />
+</Solution>
