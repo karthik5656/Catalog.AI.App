@@ -7,7 +7,7 @@ The Catalog Assistant MFE is an embeddable customer-facing widget. Rendered on p
 
 ## 2. Component Directory Structure
 ```
-/src/frontend/catalog-assistant-mfe/
+Catalog.AI.App/src/frontend/catalog-assistant-mfe/
 ├── vite.config.ts                   # Remote Entry setup
 ├── src/
 │   ├── components/

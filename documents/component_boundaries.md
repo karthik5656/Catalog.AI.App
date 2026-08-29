@@ -4,6 +4,22 @@ This document defines the strict architectural boundaries, single-responsibility
 
 ---
 
+## Repository Directory Structure
+
+```
+Catalog.AI.App/
+├── .github/                       # CI/CD and automation workflows
+├── docker/                        # Docker Compose topology & database initialization scripts
+├── documents/                     # Platform architecture specs & component plans
+├── src/                           # Core application source code
+│   ├── backend/                   # .NET 8 Microservices (Gateway, Catalog, AI Worker, Assistant)
+│   ├── frontend/                  # React 18 Micro Frontends (Shell, Catalog, Copilot, Assistant)
+│   └── infrastructure/            # Cloud infrastructure, Terraform, & Kubernetes manifests
+└── wireframes/                    # SVG UI/UX wireframe visual specs
+```
+
+---
+
 ## 1. Micro Frontends (MFE) Boundaries
 
 ```

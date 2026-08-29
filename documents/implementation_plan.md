@@ -73,11 +73,37 @@ Building an end-to-end, production-ready E-Commerce Merchandising & Catalog AI p
 
 ## Component Breakdown & Project Structure
 
+### Workspace & Repository Directory Structure
+```
+Catalog.AI.App/
+├── .github/                       # GitHub Actions workflows and CI/CD pipelines
+├── docker/                        # Compose files, container init scripts & Ollama entrypoints
+├── documents/                     # Platform architecture & component design documents
+│   ├── component_boundaries.md
+│   ├── implementation_plan.md
+│   ├── sequence_diagrams.md
+│   ├── v2_auth_and_sla_spec.md
+│   └── component_plans/
+├── src/                           # Platform source code root
+│   ├── backend/                   # .NET 8 Microservices & Shared Libraries
+│   │   ├── Gateway/               # YARP API Gateway
+│   │   ├── CatalogService/        # Catalog Domain Microservice
+│   │   ├── AIWorkerService/       # Asynchronous MassTransit AI Worker Service
+│   │   ├── CatalogAssistantService/ # RAG & Vector Search Microservice
+│   │   └── BuildingBlocks/        # Shared Contracts, Events & Common Utilities
+│   ├── frontend/                  # React 18 + Vite Micro-Frontends (MFEs)
+│   │   ├── shell/                 # Host Shell Container Application
+│   │   ├── catalog-mfe/           # Vendor Catalog Management MFE
+│   │   ├── copilot-mfe/           # AI Merchandising Copilot Review MFE
+│   │   └── catalog-assistant-mfe/ # Customer-facing RAG Chat Assistant MFE
+│   └── infrastructure/            # Infrastructure as Code, K8s manifests & deployment scripts
+└── wireframes/                    # UI/UX wireframe diagrams and user flow SVGs
+```
+
 ### Phase 1: Repository Setup & Docker Infrastructure
-- Setup mono-repo or multi-repo structure:
-  - `/src/frontend/` (MFEs: `shell`, `catalog-mfe`, `copilot-mfe`, `catalog-assistant-mfe`)
-  - `/src/backend/` (`Gateway`, `CatalogService`, `AIWorkerService`, `CatalogAssistantService`, `BuildingBlocks`)
-  - `/docker/` (`docker-compose.yml`, init scripts)
+- Setup mono-repo structure under `Catalog.AI.App`:
+  - Top-level folders: `.github`, `docker`, `documents`, `src`, `wireframes`.
+  - Service folders under `src/`: `backend/`, `frontend/`, and `infrastructure/`.
 - Write `docker-compose.yml` configuring PostgreSQL (`pgvector`), Redis, RabbitMQ, and Ollama.
 - Create an entrypoint script to automatically pull the slim LLM (`ollama run llama3.2:3b`) on container startup.
 

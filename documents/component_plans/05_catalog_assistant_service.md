@@ -7,7 +7,7 @@ The Catalog Assistant Microservice delivers real-time RAG (Retrieval-Augmented G
 
 ## 2. Component Project Structure
 ```
-/src/backend/CatalogAssistantService/
+Catalog.AI.App/src/backend/CatalogAssistantService/
 ├── Controllers/
 │   └── AssistantController.cs      # Streaming SSE Endpoint (/api/assistant/ask)
 ├── Services/

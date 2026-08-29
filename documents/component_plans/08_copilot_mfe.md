@@ -7,7 +7,7 @@ The AI Merchandising Copilot MFE provides vendors with a side-by-side review int
 
 ## 2. Component Directory Structure
 ```
-/src/frontend/copilot-mfe/
+Catalog.AI.App/src/frontend/copilot-mfe/
 ├── vite.config.ts                   # Remote Entry setup
 ├── src/
 │   ├── components/

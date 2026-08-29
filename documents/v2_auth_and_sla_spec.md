@@ -4,6 +4,22 @@ This document defines the architecture, security models, role-based access contr
 
 ---
 
+## Repository Directory Structure
+
+```
+Catalog.AI.App/
+├── .github/                       # CI/CD workflows and security scans
+├── docker/                        # Local container orchestration & database scripts
+├── documents/                     # Platform architecture specs & component plans
+├── src/                           # Platform source code root
+│   ├── backend/                   # .NET 8 Microservices (Auth & API SLAs)
+│   ├── frontend/                  # React 18 Micro Frontends (Auth Guards)
+│   └── infrastructure/            # Cloud deployment manifests & IaC
+└── wireframes/                    # Visual design specs & SVG diagrams
+```
+
+---
+
 ## 1. Authentication & Authorization (AuthN & AuthZ) Architecture
 
 ```

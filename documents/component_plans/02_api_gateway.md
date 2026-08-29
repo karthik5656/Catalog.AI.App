@@ -7,7 +7,7 @@ The API Gateway is built using **YARP (Yet Another Reverse Proxy)** in .NET 8. I
 
 ## 2. Component Project Structure
 ```
-/src/backend/Gateway/
+Catalog.AI.App/src/backend/Gateway/
 ├── ApiGateway.csproj
 ├── Program.cs
 ├── appsettings.json

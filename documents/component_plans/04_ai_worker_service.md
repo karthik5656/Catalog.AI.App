@@ -7,7 +7,7 @@ The AI Worker Service is an asynchronous background consumer. It listens to `Pro
 
 ## 2. Component Project Structure
 ```
-/src/backend/AIWorkerService/
+Catalog.AI.App/src/backend/AIWorkerService/
 ├── Consumers/
 │   └── ProductCreatedConsumer.cs   # MassTransit RabbitMQ Consumer
 ├── Services/

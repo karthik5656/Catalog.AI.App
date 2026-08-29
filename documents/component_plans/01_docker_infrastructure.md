@@ -7,14 +7,18 @@ The Docker Infrastructure establishes the local development runtime using Docker
 
 ## 2. Directory & File Structure
 ```
-/docker/
-├── docker-compose.yml
-├── init-scripts/
-│   ├── 01-init-databases.sql      # Creates catalog_db and vector_db schemas
-│   └── 02-enable-pgvector.sql     # Installs pgvector extension
-├── ollama/
-│   └── Entrypoint.sh              # Auto-pulls slim SLM model on container start
-└── README.md
+Catalog.AI.App/
+├── docker/                        # Container Compose configs & local runtime scripts
+│   ├── docker-compose.yml
+│   ├── init-scripts/
+│   │   ├── 01-init-databases.sql  # Creates catalog_db and vector_db schemas
+│   │   └── 02-enable-pgvector.sql # Installs pgvector extension
+│   └── ollama/
+│       └── entrypoint.sh          # Auto-pulls slim SLM model on container start
+└── src/
+    └── infrastructure/            # Infrastructure as Code, helm charts & environment configs
+        ├── terraform/             # Cloud provision modules (Azure/AWS)
+        └── k8s/                   # Kubernetes deployment & service manifests
 ```
 
 ---

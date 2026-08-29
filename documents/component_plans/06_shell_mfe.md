@@ -7,7 +7,7 @@ The Shell MFE is the host container application. Built with React 18, Vite, and 
 
 ## 2. Component Directory Structure
 ```
-/src/frontend/shell/
+Catalog.AI.App/src/frontend/shell/
 ├── vite.config.ts                   # Module Federation Host configuration
 ├── package.json
 ├── src/

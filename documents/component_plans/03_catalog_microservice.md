@@ -7,7 +7,7 @@ The Catalog Microservice is the core domain service managing Products, Categorie
 
 ## 2. Component Project Structure
 ```
-/src/backend/CatalogService/
+Catalog.AI.App/src/backend/CatalogService/
 ├── CatalogService.Domain/           # Entities (Product, Category, EnrichmentDraft)
 ├── CatalogService.Application/      # CQRS Handlers (MediatR), DTOs, Validators (FluentValidation)
 ├── CatalogService.Infrastructure/   # EF Core DbContext, PostgreSQL Repositories, MassTransit Publisher

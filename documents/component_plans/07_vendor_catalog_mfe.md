@@ -7,7 +7,7 @@ The Vendor Catalog MFE is dedicated to product lifecycle management. Vendors can
 
 ## 2. Component Directory Structure
 ```
-/src/frontend/catalog-mfe/
+Catalog.AI.App/src/frontend/catalog-mfe/
 ├── vite.config.ts                   # Module Federation Remote configuration
 ├── src/
 │   ├── components/
