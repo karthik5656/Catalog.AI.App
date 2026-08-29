@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#0F172A"/>
+  
+  <!-- Header Bar -->
+  <rect x="0" y="0" width="1440" height="64" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <rect x="24" y="18" width="28" height="28" rx="6" fill="#3B82F6"/>
+  <text x="64" y="37" fill="#F8FAFC" font-family="sans-serif" font-size="16" font-weight="bold">ShopSmart Catalog</text>
+  <rect x="500" y="14" width="440" height="36" rx="18" fill="#0F172A" stroke="#334155"/>
+  <text x="530" y="37" fill="#64748B" font-family="sans-serif" font-size="13">Search products, brands, categories...</text>
+  
+  <!-- Main Catalog Grid (Background Context) -->
+  <text x="40" y="105" fill="#F8FAFC" font-family="sans-serif" font-size="20" font-weight="bold">Trending Outdoors &amp; Fitness Gear</text>
+  
+  <rect x="40" y="130" width="260" height="320" rx="8" fill="#1E293B" stroke="#334155"/>
+  <rect x="56" y="146" width="228" height="150" rx="6" fill="#334155"/>
+  <text x="56" y="320" fill="#F8FAFC" font-family="sans-serif" font-size="14" font-weight="bold">EcoGuard 750ml Bottle</text>
+  <text x="56" y="342" fill="#22C55E" font-family="sans-serif" font-size="16" font-weight="bold">$24.99</text>
+
+  <rect x="320" y="130" width="260" height="320" rx="8" fill="#1E293B" stroke="#334155"/>
+  <rect x="336" y="146" width="228" height="150" rx="6" fill="#334155"/>
+  <text x="336" y="320" fill="#F8FAFC" font-family="sans-serif" font-size="14" font-weight="bold">HydroTrail 1L Jug</text>
+  <text x="336" y="342" fill="#22C55E" font-family="sans-serif" font-size="16" font-weight="bold">$34.99</text>
+
+  <!-- Conversational AI Shopping Assistant Drawer (Right Slide-over) -->
+  <rect x="940" y="64" width="500" height="836" fill="#1E293B" stroke="#334155" stroke-width="2"/>
+  
+  <!-- Assistant Header -->
+  <rect x="940" y="64" width="500" height="64" fill="#0F172A" stroke="#334155"/>
+  <circle cx="976" cy="96" r="16" fill="#3B82F6"/>
+  <text x="969" y="101" fill="#FFFFFF" font-family="sans-serif" font-size="13" font-weight="bold">AI</text>
+  <text x="1004" y="94" fill="#F8FAFC" font-family="sans-serif" font-size="15" font-weight="bold">Personal Shopping Assistant</text>
+  <text x="1004" y="112" fill="#22C55E" font-family="sans-serif" font-size="11">Online • Powered by Catalog RAG</text>
+
+  <!-- Chat History Feed -->
+  <!-- User Bubble -->
+  <rect x="1060" y="150" width="356" height="52" rx="12" fill="#3B82F6"/>
+  <text x="1076" y="172" fill="#FFFFFF" font-family="sans-serif" font-size="13">I need an insulated water bottle under $30 that is dishwasher safe.</text>
+
+  <!-- Assistant Bubble & Recommendation Card -->
+  <rect x="964" y="220" width="452" height="340" rx="12" fill="#0F172A" stroke="#334155"/>
+  <text x="984" y="250" fill="#F8FAFC" font-family="sans-serif" font-size="13">Based on product specifications, here is the best match for your request:</text>
+
+  <!-- Product Preview Inside Chat -->
+  <rect x="984" y="270" width="412" height="150" rx="8" fill="#1E293B" stroke="#384561"/>
+  <rect x="996" y="282" width="100" height="126" rx="6" fill="#334155"/>
+  <text x="1108" y="306" fill="#F8FAFC" font-family="sans-serif" font-size="14" font-weight="bold">EcoGuard 750ml Bottle</text>
+  <text x="1108" y="328" fill="#22C55E" font-family="sans-serif" font-size="15" font-weight="bold">$24.99</text>
+  <text x="1108" y="352" fill="#94A3B8" font-family="sans-serif" font-size="12">✓ Double-wall vacuum insulated</text>
+  <text x="1108" y="372" fill="#94A3B8" font-family="sans-serif" font-size="12">✓ Dishwasher safe body (top-rack)</text>
+  <text x="1108" y="392" fill="#94A3B8" font-family="sans-serif" font-size="12">✓ 100% BPA Free</text>
+
+  <rect x="984" y="440" width="412" height="40" rx="6" fill="#3B82F6"/>
+  <text x="1130" y="465" fill="#FFFFFF" font-family="sans-serif" font-size="13" font-weight="bold">View Product Details</text>
+
+  <!-- Quick Follow-up Pills -->
+  <text x="964" y="590" fill="#64748B" font-family="sans-serif" font-size="12">Suggested questions:</text>
+  <rect x="964" y="605" width="220" height="32" rx="16" fill="#0F172A" stroke="#334155"/>
+  <text x="980" y="626" fill="#94A3B8" font-family="sans-serif" font-size="12">What warranty is included?</text>
+
+  <rect x="1194" y="605" width="210" height="32" rx="16" fill="#0F172A" stroke="#334155"/>
+  <text x="1210" y="626" fill="#94A3B8" font-family="sans-serif" font-size="12">Check color availability</text>
+
+  <!-- Chat Input Bar -->
+  <rect x="964" y="820" width="452" height="52" rx="26" fill="#0F172A" stroke="#334155"/>
+  <text x="988" y="851" fill="#64748B" font-family="sans-serif" font-size="13">Ask anything about specs, warranty, stock...</text>
+  <circle cx="1388" cy="846" r="18" fill="#3B82F6"/>
+  <text x="1382" y="851" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold">➔</text>
+</svg>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#0F172A"/>
+  
+  <!-- Header Bar -->
+  <rect x="0" y="0" width="1440" height="64" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <rect x="24" y="18" width="28" height="28" rx="6" fill="#3B82F6"/>
+  <text x="64" y="37" fill="#F8FAFC" font-family="sans-serif" font-size="16" font-weight="bold">Catalog.AI</text>
+  <text x="150" y="37" fill="#64748B" font-family="sans-serif" font-size="14">|</text>
+  <text x="170" y="37" fill="#94A3B8" font-family="sans-serif" font-size="14">Vendor Portal</text>
+  
+  <!-- User Profile -->
+  <circle cx="1380" cy="32" r="16" fill="#334155"/>
+  <text x="1374" y="37" fill="#F8FAFC" font-family="sans-serif" font-size="12" font-weight="bold">JS</text>
+  
+  <!-- Sidebar -->
+  <rect x="0" y="64" width="240" height="836" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+  <rect x="16" y="88" width="208" height="40" rx="6" fill="#3B82F6"/>
+  <text x="56" y="113" fill="#FFFFFF" font-family="sans-serif" font-size="13" font-weight="bold">📦 Products</text>
+  
+  <text x="56" y="165" fill="#94A3B8" font-family="sans-serif" font-size="13">✨ AI Enrichment Queue</text>
+  <text x="56" y="215" fill="#94A3B8" font-family="sans-serif" font-size="13">📊 Analytics</text>
+  <text x="56" y="265" fill="#94A3B8" font-family="sans-serif" font-size="13">⚙️ Settings</text>
+
+  <!-- Main Content Area -->
+  <!-- Top Bar Actions -->
+  <text x="280" y="108" fill="#F8FAFC" font-family="sans-serif" font-size="22" font-weight="bold">Add New Product</text>
+  <text x="280" y="132" fill="#94A3B8" font-family="sans-serif" font-size="13">Enter raw catalog specifications to queue automated AI SEO enrichment</text>
+
+  <!-- Form Container -->
+  <rect x="280" y="160" width="1120" height="700" rx="8" fill="#1E293B" stroke="#334155"/>
+  
+  <!-- Form Field 1: Title -->
+  <text x="312" y="200" fill="#F8FAFC" font-family="sans-serif" font-size="13" font-weight="bold">Product Name / Title *</text>
+  <rect x="312" y="212" width="1056" height="44" rx="6" fill="#0F172A" stroke="#475569"/>
+  <text x="328" y="239" fill="#F8FAFC" font-family="sans-serif" font-size="13">Stainless Steel Vacuum Water Bottle 750ml</text>
+
+  <!-- Form Field 2: Category & SKU Row -->
+  <text x="312" y="284" fill="#F8FAFC" font-family="sans-serif" font-size="13" font-weight="bold">Category</text>
+  <rect x="312" y="296" width="516" height="44" rx="6" fill="#0F172A" stroke="#475569"/>
+  <text x="328" y="323" fill="#F8FAFC" font-family="sans-serif" font-size="13">Fitness &amp; Outdoors</text>
+
+  <text x="852" y="284" fill="#F8FAFC" font-family="sans-serif" font-size="13" font-weight="bold">Vendor SKU</text>
+  <rect x="852" y="296" width="516" height="44" rx="6" fill="#0F172A" stroke="#475569"/>
+  <text x="868" y="323" fill="#F8FAFC" font-family="sans-serif" font-size="13">SKU-BOT-750ML</text>
+
+  <!-- Form Field 3: Raw Description / Specs -->
+  <text x="312" y="368" fill="#F8FAFC" font-family="sans-serif" font-size="13" font-weight="bold">Raw Product Specifications &amp; Features</text>
+  <rect x="312" y="380" width="1056" height="140" rx="6" fill="#0F172A" stroke="#475569"/>
+  <text x="328" y="408" fill="#94A3B8" font-family="sans-serif" font-size="13">750ml capacity. Double wall vacuum insulation. Keeps drinks cold 24h, hot 12h.</text>
+  <text x="328" y="432" fill="#94A3B8" font-family="sans-serif" font-size="13">BPA free lid with carrying handle. Dishwasher safe body. 18/8 food grade steel.</text>
+
+  <!-- Form Field 4: Price & Stock -->
+  <text x="312" y="548" fill="#F8FAFC" font-family="sans-serif" font-size="13" font-weight="bold">Base Price ($)</text>
+  <rect x="312" y="560" width="516" height="44" rx="6" fill="#0F172A" stroke="#475569"/>
+  <text x="328" y="587" fill="#F8FAFC" font-family="sans-serif" font-size="13">24.99</text>
+
+  <text x="852" y="548" fill="#F8FAFC" font-family="sans-serif" font-size="13" font-weight="bold">Initial Inventory Stock</text>
+  <rect x="852" y="560" width="516" height="44" rx="6" fill="#0F172A" stroke="#475569"/>
+  <text x="868" y="587" fill="#F8FAFC" font-family="sans-serif" font-size="13">500</text>
+
+  <!-- Action Buttons -->
+  <rect x="312" y="650" width="220" height="48" rx="6" fill="#3B82F6"/>
+  <text x="342" y="679" fill="#FFFFFF" font-family="sans-serif" font-size="14" font-weight="bold">Submit &amp; AI Enrich ✨</text>
+
+  <rect x="548" y="650" width="120" height="48" rx="6" fill="#334155"/>
+  <text x="580" y="679" fill="#F8FAFC" font-family="sans-serif" font-size="14">Save Draft</text>
+</svg>

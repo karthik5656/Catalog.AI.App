@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#141A24"/>
+  <rect x="40" y="30" width="1360" height="64" rx="8" fill="#1C2130" stroke="#384561" stroke-width="1"/>
+  <rect x="64" y="48" width="28" height="28" rx="6" fill="#3B82F6"/>
+  <text x="104" y="68" fill="#F2F5FA" font-family="sans-serif" font-size="16" font-weight="bold">Catalog.AI Platform</text>
+  <text x="600" y="68" fill="#3B82F6" font-family="sans-serif" font-size="13" font-weight="bold">Shell Overview</text>
+  <text x="730" y="68" fill="#99A8C2" font-family="sans-serif" font-size="13">Vendor Catalog MFE</text>
+  <text x="890" y="68" fill="#99A8C2" font-family="sans-serif" font-size="13">AI Merchandising Copilot</text>
+  <text x="1080" y="68" fill="#99A8C2" font-family="sans-serif" font-size="13">Catalog Assistant MFE</text>
+  <rect x="1250" y="48" width="130" height="28" rx="4" fill="#29B775"/>
+  <text x="1262" y="66" fill="#FFFFFF" font-family="sans-serif" font-size="11" font-weight="bold">Ollama SLM: Ready</text>
+  <g transform="translate(40, 118)">
+    <rect x="0" y="0" width="320" height="110" rx="8" fill="#21293B" stroke="#384561"/>
+    <text x="20" y="32" fill="#99A8C2" font-family="sans-serif" font-size="12">TOTAL PRODUCTS</text>
+    <text x="20" y="68" fill="#F2F5FA" font-family="sans-serif" font-size="24" font-weight="bold">12,450</text>
+    <text x="20" y="92" fill="#29B775" font-family="sans-serif" font-size="11">+14% this week</text>
+    <rect x="346" y="0" width="320" height="110" rx="8" fill="#21293B" stroke="#384561"/>
+    <text x="366" y="32" fill="#99A8C2" font-family="sans-serif" font-size="12">AI ENRICHED</text>
+    <text x="366" y="68" fill="#F2F5FA" font-family="sans-serif" font-size="24" font-weight="bold">9,820</text>
+    <text x="366" y="92" fill="#29B775" font-family="sans-serif" font-size="11">78.8% Coverage</text>
+    <rect x="693" y="0" width="320" height="110" rx="8" fill="#21293B" stroke="#384561"/>
+    <text x="713" y="32" fill="#99A8C2" font-family="sans-serif" font-size="12">PENDING COPILOT REVIEW</text>
+    <text x="713" y="68" fill="#F2F5FA" font-family="sans-serif" font-size="24" font-weight="bold">342</text>
+    <text x="713" y="92" fill="#F3A626" font-family="sans-serif" font-size="11">Action required</text>
+    <rect x="1040" y="0" width="320" height="110" rx="8" fill="#21293B" stroke="#384561"/>
+    <text x="1060" y="32" fill="#99A8C2" font-family="sans-serif" font-size="12">RAG ASSISTANT SLA</text>
+    <text x="1060" y="68" fill="#F2F5FA" font-family="sans-serif" font-size="24" font-weight="bold">340ms</text>
+    <text x="1060" y="92" fill="#29B775" font-family="sans-serif" font-size="11">TTFT &lt; 400ms target</text>
+  </g>
+  <rect x="40" y="250" width="1360" height="600" rx="8" fill="#21293B" stroke="#384561"/>
+  <text x="64" y="290" fill="#F2F5FA" font-family="sans-serif" font-size="18" font-weight="bold">Micro-Frontend Architecture Status</text>
+  <text x="64" y="315" fill="#99A8C2" font-family="sans-serif" font-size="13">YARP API Gateway routing traffic across 3 independent React Remote MFEs</text>
+  <rect x="64" y="350" width="415" height="220" rx="8" fill="#1C2130" stroke="#384561"/>
+  <text x="88" y="390" fill="#F2F5FA" font-family="sans-serif" font-size="16" font-weight="bold">Vendor Catalog MFE</text>
+  <text x="88" y="420" fill="#99A8C2" font-family="sans-serif" font-size="13">CRUD, Batch Upload &amp; Raw Inventory Ingestion</text>
+  <rect x="88" y="500" width="140" height="28" rx="4" fill="#29B775"/>
+  <text x="100" y="518" fill="#FFFFFF" font-family="sans-serif" font-size="11">Active (Port 5001)</text>
+  <rect x="512" y="350" width="415" height="220" rx="8" fill="#1C2130" stroke="#384561"/>
+  <text x="536" y="390" fill="#F2F5FA" font-family="sans-serif" font-size="16" font-weight="bold">AI Merchandising Copilot MFE</text>
+  <text x="536" y="420" fill="#99A8C2" font-family="sans-serif" font-size="13">Split-Screen AI SEO Title &amp; Spec Review</text>
+  <rect x="536" y="500" width="140" height="28" rx="4" fill="#29B775"/>
+  <text x="548" y="518" fill="#FFFFFF" font-family="sans-serif" font-size="11">Active (Port 5002)</text>
+  <rect x="960" y="350" width="415" height="220" rx="8" fill="#1C2130" stroke="#384561"/>
+  <text x="984" y="390" fill="#F2F5FA" font-family="sans-serif" font-size="16" font-weight="bold">Catalog Assistant MFE</text>
+  <text x="984" y="420" fill="#99A8C2" font-family="sans-serif" font-size="13">RAG Natural Language Chat Shopping Assistant</text>
+  <rect x="984" y="500" width="140" height="28" rx="4" fill="#29B775"/>
+  <text x="996" y="518" fill="#FFFFFF" font-family="sans-serif" font-size="11">Active (Port 5003)</text>
+</svg>
