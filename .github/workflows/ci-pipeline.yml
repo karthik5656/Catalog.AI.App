@@ -1,11 +1,9 @@
-name: CI/CD Pipeline - Unit Tests, Selective Docker Builds & GHCR Publishing
+name: CI/CD Pipeline - PR Unit Tests & Selective Docker Builds (GHCR)
 
 on:
-  push:
-    branches: [ '**' ]
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ '**' ]
+    branches: [ main, master ]
 
 permissions:
   contents: read
@@ -79,12 +77,12 @@ jobs:
               - '.github/workflows/**'
 
   # ---------------------------------------------------------------------------
-  # Step 2: Run .NET 10 Backend Unit Tests (Conditional)
+  # Step 2: Run .NET 10 Backend Unit Tests (Conditional on PR)
   # ---------------------------------------------------------------------------
   test-backend:
     name: Run .NET 10 Backend Unit Tests
     needs: changes
-    if: ${{ needs.changes.outputs.backend_any == 'true' || github.event_name == 'push' }}
+    if: ${{ needs.changes.outputs.backend_any == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -106,12 +104,12 @@ jobs:
         run: dotnet test src/backend/ --no-build -c Release --verbosity normal
 
   # ---------------------------------------------------------------------------
-  # Step 3: Run React / Frontend Unit Tests (Conditional)
+  # Step 3: Run React / Frontend Unit Tests (Conditional on PR)
   # ---------------------------------------------------------------------------
   test-frontend:
     name: Run Frontend Unit Tests
     needs: changes
-    if: ${{ needs.changes.outputs.frontend_any == 'true' || github.event_name == 'push' }}
+    if: ${{ needs.changes.outputs.frontend_any == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -173,7 +171,7 @@ jobs:
 
       # --- 1. Gateway Microservice ---
       - name: Build & Push Gateway Container
-        if: ${{ needs.changes.outputs.backend_gateway == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.backend_gateway == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -181,11 +179,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:latest
 
       # --- 2. Catalog Microservice ---
       - name: Build & Push Catalog Microservice Container
-        if: ${{ needs.changes.outputs.backend_catalog == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.backend_catalog == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -193,11 +190,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:latest
 
       # --- 3. AI Worker Microservice ---
       - name: Build & Push AI Worker Container
-        if: ${{ needs.changes.outputs.backend_ai_worker == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.backend_ai_worker == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -205,11 +201,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:latest
 
       # --- 4. Catalog Assistant RAG Microservice ---
       - name: Build & Push Catalog Assistant Service Container
-        if: ${{ needs.changes.outputs.backend_assistant == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.backend_assistant == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -217,11 +212,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:latest
 
       # --- 5. Shell MFE ---
       - name: Build & Push Shell MFE Container
-        if: ${{ needs.changes.outputs.frontend_shell == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.frontend_shell == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ./src/frontend/shell
@@ -229,11 +223,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:latest
 
       # --- 6. Vendor Catalog MFE ---
       - name: Build & Push Vendor Catalog MFE Container
-        if: ${{ needs.changes.outputs.frontend_catalog_mfe == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.frontend_catalog_mfe == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ./src/frontend/catalog-mfe
@@ -241,11 +234,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:latest
 
       # --- 7. Copilot MFE ---
       - name: Build & Push Copilot MFE Container
-        if: ${{ needs.changes.outputs.frontend_copilot_mfe == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.frontend_copilot_mfe == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ./src/frontend/copilot-mfe
@@ -253,11 +245,10 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:latest
 
       # --- 8. Catalog Assistant MFE ---
       - name: Build & Push Catalog Assistant MFE Container
-        if: ${{ needs.changes.outputs.frontend_assistant_mfe == 'true' || needs.changes.outputs.docker_global == 'true' || github.event_name == 'push' }}
+        if: ${{ needs.changes.outputs.frontend_assistant_mfe == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: ./src/frontend/catalog-assistant-mfe
@@ -265,4 +256,3 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:${{ env.IMAGE_TAG }}
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:latest
