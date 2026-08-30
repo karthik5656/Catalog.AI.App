@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-
-namespace Catalog.API;
+namespace Catalog.App.Api;
 
 public class Program
 {
