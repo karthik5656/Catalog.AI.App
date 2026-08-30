@@ -1,5 +1,6 @@
 import { Link, Outlet } from "react-router-dom";
 import { remoteApps } from "../remoteApps.generated";
+import type { RemoteAppRoute } from "../types";
 
 console.log("remoteApps", remoteApps);
 
@@ -23,7 +24,7 @@ function ShellLayout() {
 					<Link to="/" style={{ color: "var(--text, #6b6375)", textDecoration: "none" }}>
 						Home
 					</Link>
-					{remoteApps.map(({ route, label }) => (
+					{(remoteApps as RemoteAppRoute[]).map(({ route, label }) => (
 						<Link key={route} to={`/${route}`} style={{ color: "var(--text, #6b6375)", textDecoration: "none" }}>
 							{label}
 						</Link>
