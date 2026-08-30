@@ -1,4 +1,4 @@
-﻿namespace Catalog.App.Api;
+namespace Catalog.App.Api;
 
 public class Startup
 {
@@ -28,7 +28,7 @@ public class Startup
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Catalog API v1");
+                options.SwaggerEndpoint("v1/swagger.json", "Catalog API v1");
                 options.RoutePrefix = "swagger";
             });
         }
