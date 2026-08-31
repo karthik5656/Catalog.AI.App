@@ -8,6 +8,7 @@ permissions:
   contents: read
   packages: write       # Publish Docker images to ghcr.io
   pull-requests: write  # Post & delete PR comments
+  issues: write         # Access issues API for PR comments
 
 env:
   REGISTRY: ghcr.io
@@ -273,36 +274,37 @@ jobs:
           IMAGES=""
 
           if [ "${{ steps.build_gateway.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **Gateway Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}Gateway Service,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}"$'\n'
           fi
           if [ "${{ steps.build_catalog.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **Catalog Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}Catalog Service,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}"$'\n'
           fi
           if [ "${{ steps.build_chat.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **Chat Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/chat-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}Chat Service,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/chat-service:${{ env.IMAGE_TAG }}"$'\n'
           fi
           if [ "${{ steps.build_rag.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **RAG Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/rag-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}RAG Service,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/rag-service:${{ env.IMAGE_TAG }}"$'\n'
           fi
           if [ "${{ steps.build_ui_catalog.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **UI Catalog** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}UI Catalog,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog:${{ env.IMAGE_TAG }}"$'\n'
           fi
           if [ "${{ steps.build_ui_consumer.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **UI Catalog Consumer** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-consumer:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}UI Catalog Consumer,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-consumer:${{ env.IMAGE_TAG }}"$'\n'
           fi
           if [ "${{ steps.build_ui_merchant.outcome }}" = "success" ]; then
-            IMAGES="${IMAGES}| **UI Catalog Merchant** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-merchant:${{ env.IMAGE_TAG }}\` |"$'\n'
+            IMAGES="${IMAGES}UI Catalog Merchant,${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-merchant:${{ env.IMAGE_TAG }}"$'\n'
           fi
 
           if [ -z "$IMAGES" ]; then
             echo "has_images=false" >> $GITHUB_OUTPUT
           else
             echo "has_images=true" >> $GITHUB_OUTPUT
+            # Write to env var using heredoc (safe for multi-line)
             {
-              echo "images<<IMAGES_EOF"
-              echo "$IMAGES"
+              echo "BUILT_IMAGES<<IMAGES_EOF"
+              printf "%s" "$IMAGES"
               echo "IMAGES_EOF"
-            } >> $GITHUB_OUTPUT
+            } >> $GITHUB_ENV
           fi
 
       # -----------------------------------------------------------------------
@@ -314,7 +316,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const tag = '${{ env.COMMENT_TAG }}';
+            const tag = '<!-- catalog-ci-docker-images -->';
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -337,22 +339,30 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const tag = `${{ env.COMMENT_TAG }}`;
-            const images = `${{ steps.collect.outputs.images }}`;
-            const sha = `${{ github.sha }}`;
-            const shortSha = sha.substring(0, 7);
+            const tag = '<!-- catalog-ci-docker-images -->';
+            const raw = process.env.BUILT_IMAGES || '';
+            const shortSha = context.sha.substring(0, 7);
+            const registry = process.env.REGISTRY || 'ghcr.io';
 
-            const body = `${tag}
-            ## 🐳 Docker Images Published
+            // Build table rows from "Name,Image" CSV lines
+            const rows = raw.trim().split('\n').filter(Boolean).map(line => {
+              const [name, image] = line.split(',', 2);
+              return '| **' + name + '** | `' + image + '` |';
+            }).join('\n');
 
-            > **Commit:** \`${shortSha}\` | **Registry:** \`${{ env.REGISTRY }}\`
-
-            | Service | Image |
-            |---------|-------|
-            ${images.trim()}
-
-            ---
-            *Published by CI pipeline • ${new Date().toISOString()}*`;
+            const body = [
+              tag,
+              '## 🐳 Docker Images Published',
+              '',
+              '> **Commit:** `' + shortSha + '` | **Registry:** `' + registry + '`',
+              '',
+              '| Service | Image |',
+              '|---------|-------|',
+              rows,
+              '',
+              '---',
+              '*Published by CI pipeline • ' + new Date().toISOString() + '*',
+            ].join('\n');
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -360,3 +370,4 @@ jobs:
               issue_number: context.issue.number,
               body: body,
             });
+
