@@ -1,31 +1,33 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vite';
+import type { Plugin } from 'vite';
 import federation from '@originjs/vite-plugin-federation';
 import react from '@vitejs/plugin-react';
+import type { RemoteConfigEntry } from './src/types.ts';
 
 // Read remote apps config — single source of truth
 const remotesConfigPath = path.resolve(import.meta.dirname, 'remotes.json');
-const remotesConfig = JSON.parse(fs.readFileSync(remotesConfigPath, 'utf-8'));
+const remotesConfig: RemoteConfigEntry[] = JSON.parse(fs.readFileSync(remotesConfigPath, 'utf-8'));
 
 // Build federation remotes map from JSON: { scope: url }
-const federationRemotes = {};
+const federationRemotes: Record<string, string> = {};
 for (const remote of remotesConfig) {
   federationRemotes[remote.scope] = remote.url;
 }
 
 /**
- * Vite plugin that generates src/remoteApps.generated.jsx from remotes.json.
+ * Vite plugin that generates src/remoteApps.generated.tsx from remotes.json.
  * The generated file contains static import() calls that the federation plugin
  * can transform in both dev and build modes.
  *
  * In dev mode, it also watches remotes.json for changes and regenerates.
  */
-function remoteAppsPlugin() {
-  const outputPath = path.resolve(import.meta.dirname, 'src', 'remoteApps.generated.jsx');
+function remoteAppsPlugin(): Plugin {
+  const outputPath = path.resolve(import.meta.dirname, 'src', 'remoteApps.generated.tsx');
 
   function generate() {
-    const config = JSON.parse(fs.readFileSync(remotesConfigPath, 'utf-8'));
+    const config: RemoteConfigEntry[] = JSON.parse(fs.readFileSync(remotesConfigPath, 'utf-8'));
 
     const entries = config.map((app) => {
       const modulePath = app.module.replace('./', '');
@@ -38,8 +40,9 @@ function remoteAppsPlugin() {
 
     const code = `/* AUTO-GENERATED from remotes.json — do not edit manually */
 import React from 'react';
+import type { RemoteAppRoute } from './types';
 
-export const remoteApps = [
+export const remoteApps: RemoteAppRoute[] = [
 ${entries.join(',\n')}
 ];
 `;
