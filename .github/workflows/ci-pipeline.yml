@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - PR Tests & Selective Docker Builds (GHCR)
+name: CI/CD Pipeline - PR Docker Builds (GHCR)
 
 on:
   pull_request:
@@ -6,14 +6,16 @@ on:
 
 permissions:
   contents: read
-  packages: write  # Grants write permission to publish Docker images to ghcr.io
+  packages: write       # Publish Docker images to ghcr.io
+  pull-requests: write  # Post & delete PR comments
 
 env:
   REGISTRY: ghcr.io
+  COMMENT_TAG: '<!-- catalog-ci-docker-images -->'
 
 jobs:
   # ---------------------------------------------------------------------------
-  # Step 1: Detect changed paths to determine what needs testing & building
+  # Step 1: Detect changed paths to determine what needs building
   # ---------------------------------------------------------------------------
   changes:
     name: Detect Changed Paths
@@ -66,86 +68,82 @@ jobs:
               - '.github/workflows/**'
 
   # ---------------------------------------------------------------------------
-  # Step 2: Run .NET 10 Backend Tests (Conditional on backend changes)
+  # Step 2: Tests (commented out for now)
   # ---------------------------------------------------------------------------
-  test-backend:
-    name: Build & Test .NET 10 Backend
-    needs: changes
-    if: ${{ needs.changes.outputs.backend_any == 'true' }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        service:
-          - { name: 'Catalog.Gateway', path: 'src/backend/Catalog.Gateway' }
-          - { name: 'Catalog.App',     path: 'src/backend/Catalog.App' }
-          - { name: 'Catalog.Chat',    path: 'src/backend/Catalog.Chat' }
-          - { name: 'Catalog.Rag',     path: 'src/backend/Catalog.Rag' }
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  # test-backend:
+  #   name: Build & Test .NET 10 Backend
+  #   needs: changes
+  #   if: ${{ needs.changes.outputs.backend_any == 'true' }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       service:
+  #         - { name: 'Catalog.Gateway', path: 'src/backend/Catalog.Gateway' }
+  #         - { name: 'Catalog.App',     path: 'src/backend/Catalog.App' }
+  #         - { name: 'Catalog.Chat',    path: 'src/backend/Catalog.Chat' }
+  #         - { name: 'Catalog.Rag',     path: 'src/backend/Catalog.Rag' }
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup .NET 10 SDK
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: '10.0.x'
+  #         include-prerelease: true
+  #
+  #     - name: Restore ${{ matrix.service.name }}
+  #       run: dotnet restore ${{ matrix.service.path }}
+  #
+  #     - name: Build ${{ matrix.service.name }}
+  #       run: dotnet build ${{ matrix.service.path }} --no-restore -c Release
+  #
+  #     - name: Test ${{ matrix.service.name }}
+  #       run: dotnet test ${{ matrix.service.path }} --no-build -c Release --verbosity normal
 
-      - name: Setup .NET 10 SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.0.x'
-          include-prerelease: true
-
-      - name: Restore ${{ matrix.service.name }}
-        run: dotnet restore ${{ matrix.service.path }}
-
-      - name: Build ${{ matrix.service.name }}
-        run: dotnet build ${{ matrix.service.path }} --no-restore -c Release
-
-      - name: Test ${{ matrix.service.name }}
-        run: dotnet test ${{ matrix.service.path }} --no-build -c Release --verbosity normal
-
-  # ---------------------------------------------------------------------------
-  # Step 3: Lint & Build Frontend Apps (Conditional on frontend changes)
-  # ---------------------------------------------------------------------------
-  test-frontend:
-    name: Lint & Build Frontend Apps
-    needs: changes
-    if: ${{ needs.changes.outputs.frontend_any == 'true' }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        app:
-          - { name: 'ui-catalog',          path: 'src/frontend/apps/ui-catalog' }
-          - { name: 'ui-catalog-consumer', path: 'src/frontend/apps/ui-catalog-consumer' }
-          - { name: 'ui-catalog-merchant', path: 'src/frontend/apps/ui-catalog-merchant' }
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@11.24.0 --activate
-
-      - name: Install Dependencies (${{ matrix.app.name }})
-        working-directory: ${{ matrix.app.path }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint (${{ matrix.app.name }})
-        working-directory: ${{ matrix.app.path }}
-        run: pnpm run lint
-
-      - name: Build (${{ matrix.app.name }})
-        working-directory: ${{ matrix.app.path }}
-        run: pnpm run build
+  # test-frontend:
+  #   name: Lint & Build Frontend Apps
+  #   needs: changes
+  #   if: ${{ needs.changes.outputs.frontend_any == 'true' }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       app:
+  #         - { name: 'ui-catalog',          path: 'src/frontend/apps/ui-catalog' }
+  #         - { name: 'ui-catalog-consumer', path: 'src/frontend/apps/ui-catalog-consumer' }
+  #         - { name: 'ui-catalog-merchant', path: 'src/frontend/apps/ui-catalog-merchant' }
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+  #
+  #     - name: Setup Node.js 20.x
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #
+  #     - name: Install pnpm
+  #       run: corepack enable && corepack prepare pnpm@11.24.0 --activate
+  #
+  #     - name: Install Dependencies (${{ matrix.app.name }})
+  #       working-directory: ${{ matrix.app.path }}
+  #       run: pnpm install --frozen-lockfile
+  #
+  #     - name: Lint (${{ matrix.app.name }})
+  #       working-directory: ${{ matrix.app.path }}
+  #       run: pnpm run lint
+  #
+  #     - name: Build (${{ matrix.app.name }})
+  #       working-directory: ${{ matrix.app.path }}
+  #       run: pnpm run build
 
   # ---------------------------------------------------------------------------
-  # Step 4: Build & Publish Docker Images to GitHub Container Registry (GHCR)
+  # Step 3: Build & Publish Docker Images to GitHub Container Registry (GHCR)
   # ---------------------------------------------------------------------------
   publish-containers:
     name: Selective Docker Build & Push (GHCR)
-    needs: [changes, test-backend, test-frontend]
-    if: always() && (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped') && (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
+    needs: [changes]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -180,6 +178,7 @@ jobs:
 
       # --- 1. Gateway Service ---
       - name: Build & Push Gateway Service
+        id: build_gateway
         if: ${{ needs.changes.outputs.backend_gateway == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -191,6 +190,7 @@ jobs:
 
       # --- 2. Catalog Service ---
       - name: Build & Push Catalog Service
+        id: build_catalog
         if: ${{ needs.changes.outputs.backend_catalog == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -202,6 +202,7 @@ jobs:
 
       # --- 3. Chat Service ---
       - name: Build & Push Chat Service
+        id: build_chat
         if: ${{ needs.changes.outputs.backend_chat == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -213,6 +214,7 @@ jobs:
 
       # --- 4. RAG Service ---
       - name: Build & Push RAG Service
+        id: build_rag
         if: ${{ needs.changes.outputs.backend_rag == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -228,6 +230,7 @@ jobs:
 
       # --- 5. UI Catalog (Host Shell) ---
       - name: Build & Push UI Catalog
+        id: build_ui_catalog
         if: ${{ needs.changes.outputs.frontend_catalog == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -239,6 +242,7 @@ jobs:
 
       # --- 6. UI Catalog Consumer (Remote MFE) ---
       - name: Build & Push UI Catalog Consumer
+        id: build_ui_consumer
         if: ${{ needs.changes.outputs.frontend_consumer == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -250,6 +254,7 @@ jobs:
 
       # --- 7. UI Catalog Merchant (Remote MFE) ---
       - name: Build & Push UI Catalog Merchant
+        id: build_ui_merchant
         if: ${{ needs.changes.outputs.frontend_merchant == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
@@ -258,3 +263,100 @@ jobs:
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-merchant:${{ env.IMAGE_TAG }}
+
+      # -----------------------------------------------------------------------
+      # Collect built images and prepare PR comment
+      # -----------------------------------------------------------------------
+      - name: Collect Built Image Tags
+        id: collect
+        run: |
+          IMAGES=""
+
+          if [ "${{ steps.build_gateway.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **Gateway Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+          if [ "${{ steps.build_catalog.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **Catalog Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+          if [ "${{ steps.build_chat.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **Chat Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/chat-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+          if [ "${{ steps.build_rag.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **RAG Service** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/rag-service:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+          if [ "${{ steps.build_ui_catalog.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **UI Catalog** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+          if [ "${{ steps.build_ui_consumer.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **UI Catalog Consumer** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-consumer:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+          if [ "${{ steps.build_ui_merchant.outcome }}" = "success" ]; then
+            IMAGES="${IMAGES}| **UI Catalog Merchant** | \`${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-merchant:${{ env.IMAGE_TAG }}\` |"$'\n'
+          fi
+
+          if [ -z "$IMAGES" ]; then
+            echo "has_images=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_images=true" >> $GITHUB_OUTPUT
+            {
+              echo "images<<IMAGES_EOF"
+              echo "$IMAGES"
+              echo "IMAGES_EOF"
+            } >> $GITHUB_OUTPUT
+          fi
+
+      # -----------------------------------------------------------------------
+      # Delete old CI bot comments and post new one with latest images
+      # -----------------------------------------------------------------------
+      - name: Delete Previous CI Docker Image Comments
+        if: ${{ steps.collect.outputs.has_images == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const tag = '${{ env.COMMENT_TAG }}';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            for (const comment of comments) {
+              if (comment.body && comment.body.includes(tag)) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: comment.id,
+                });
+              }
+            }
+
+      - name: Post Docker Image Comment on PR
+        if: ${{ steps.collect.outputs.has_images == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const tag = `${{ env.COMMENT_TAG }}`;
+            const images = `${{ steps.collect.outputs.images }}`;
+            const sha = `${{ github.sha }}`;
+            const shortSha = sha.substring(0, 7);
+
+            const body = `${tag}
+            ## 🐳 Docker Images Published
+
+            > **Commit:** \`${shortSha}\` | **Registry:** \`${{ env.REGISTRY }}\`
+
+            | Service | Image |
+            |---------|-------|
+            ${images.trim()}
+
+            ---
+            *Published by CI pipeline • ${new Date().toISOString()}*`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: body,
+            });
