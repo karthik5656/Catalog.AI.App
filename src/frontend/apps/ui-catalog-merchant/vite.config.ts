@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [
     react(),
     federation({
-      name: 'remote_app',
+      name: 'merchantApp',
       filename: 'remoteEntry.js',
       exposes: {
         './App': './src/App',

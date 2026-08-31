@@ -1,16 +1,16 @@
 [
-  {
-    "scope": "remoteApp",
-    "url": "http://localhost:3001/assets/remoteEntry.js",
-    "module": "./App",
-    "route": "merchant",
-    "label": "Merchant"
-  },
-  {
-    "scope": "remoteApp",
-    "url": "http://localhost:3001/assets/remoteEntry.js",
-    "module": "./App",
-    "route": "merchant2",
-    "label": "Merchant2"
-  }
+	{
+		"scope": "merchantApp",
+		"url": "http://localhost:3001/assets/remoteEntry.js",
+		"module": "./App",
+		"route": "merchant",
+		"label": "Merchant"
+	},
+	{
+		"scope": "consumerApp",
+		"url": "http://localhost:3002/assets/remoteEntry.js",
+		"module": "./App",
+		"route": "consumer",
+		"label": "Consumer"
+	}
 ]
