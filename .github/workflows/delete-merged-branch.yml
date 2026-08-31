@@ -56,16 +56,7 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const targetTagPrefix = `pr${prNumber}`;
             const owner = context.repo.owner;
-
-            const packages = [
-              'gateway-service',
-              'catalog-service',
-              'chat-service',
-              'rag-service',
-              'ui-catalog',
-              'ui-catalog-consumer',
-              'ui-catalog-merchant'
-            ];
+            const repoName = context.repo.repo.toLowerCase();
 
             let isOrg = false;
             try {
@@ -75,57 +66,109 @@ jobs:
               console.log(`Could not determine owner type (${e.message}), defaulting to user.`);
             }
 
-            console.log(`Cleaning up Docker images for PR #${prNumber} (tag prefix: '${targetTagPrefix}') under ${owner} (Organization: ${isOrg})...`);
+            console.log(`Cleaning up Docker images for PR #${prNumber} (tag prefix: '${targetTagPrefix}') under ${owner} (isOrg: ${isOrg})...`);
 
-            for (const pkg of packages) {
-              try {
-                let versions = [];
-                if (isOrg) {
-                  const { data } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg({
-                    package_type: 'container',
-                    package_name: pkg,
-                    org: owner,
-                    per_page: 100
-                  });
-                  versions = data;
-                } else {
-                  const { data } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByUser({
-                    package_type: 'container',
-                    package_name: pkg,
-                    username: owner,
-                    per_page: 100
-                  });
-                  versions = data;
-                }
+            // Step 1: Try to discover packages dynamically from registry
+            let discoveredPackageNames = [];
+            try {
+              if (isOrg) {
+                const { data } = await github.rest.packages.listPackagesForOrganization({
+                  package_type: 'container',
+                  org: owner,
+                  per_page: 100
+                });
+                discoveredPackageNames = data.map(p => p.name);
+              } else {
+                const { data } = await github.rest.packages.listPackagesForUser({
+                  package_type: 'container',
+                  username: owner,
+                  per_page: 100
+                });
+                discoveredPackageNames = data.map(p => p.name);
+              }
+              console.log(`Discovered container packages in registry:`, discoveredPackageNames);
+            } catch (e) {
+              console.log(`Dynamic package discovery note: ${e.message}`);
+            }
 
-                for (const ver of versions) {
-                  const tags = ver.metadata?.container?.tags || [];
-                  const matches = tags.some(t => t.startsWith(targetTagPrefix));
-                  if (matches) {
-                    console.log(`Deleting ${pkg} version ${ver.id} with tags: [${tags.join(', ')}]`);
-                    if (isOrg) {
-                      await github.rest.packages.deletePackageVersionForOrg({
-                        package_type: 'container',
-                        package_name: pkg,
-                        org: owner,
-                        package_version_id: ver.id
-                      });
-                    } else {
-                      await github.rest.packages.deletePackageVersionForUser({
-                        package_type: 'container',
-                        package_name: pkg,
-                        username: owner,
-                        package_version_id: ver.id
-                      });
-                    }
-                    console.log(`Successfully deleted ${pkg} version ${ver.id}`);
+            // Base service names in this repo
+            const baseServices = [
+              'gateway-service',
+              'catalog-service',
+              'chat-service',
+              'rag-service',
+              'ui-catalog',
+              'ui-catalog-consumer',
+              'ui-catalog-merchant'
+            ];
+
+            // Build full list of package name targets to check
+            const targetPackageNames = new Set(discoveredPackageNames);
+            for (const svc of baseServices) {
+              targetPackageNames.add(svc);
+              targetPackageNames.add(`${repoName}/${svc}`);
+              targetPackageNames.add(encodeURIComponent(`${repoName}/${svc}`));
+            }
+
+            let totalDeleted = 0;
+
+            for (const rawPkgName of targetPackageNames) {
+              // Try raw and encoded variations
+              const namesToTry = Array.from(new Set([rawPkgName, encodeURIComponent(rawPkgName)]));
+
+              for (const pkgName of namesToTry) {
+                try {
+                  let versions = [];
+                  if (isOrg) {
+                    const { data } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg({
+                      package_type: 'container',
+                      package_name: pkgName,
+                      org: owner,
+                      per_page: 100
+                    });
+                    versions = data;
+                  } else {
+                    const { data } = await github.rest.packages.getAllPackageVersionsForPackageOwnedByUser({
+                      package_type: 'container',
+                      package_name: pkgName,
+                      username: owner,
+                      per_page: 100
+                    });
+                    versions = data;
                   }
-                }
-              } catch (err) {
-                if (err.status === 404) {
-                  console.log(`Package '${pkg}' not found in registry (skipped).`);
-                } else {
-                  console.warn(`Error querying package '${pkg}': ${err.message}`);
+
+                  for (const ver of versions) {
+                    const tags = ver.metadata?.container?.tags || [];
+                    const matches = tags.some(t => t.startsWith(targetTagPrefix));
+                    if (matches) {
+                      console.log(`Deleting package '${pkgName}' version ${ver.id} with tags: [${tags.join(', ')}]`);
+                      if (isOrg) {
+                        await github.rest.packages.deletePackageVersionForOrg({
+                          package_type: 'container',
+                          package_name: pkgName,
+                          org: owner,
+                          package_version_id: ver.id
+                        });
+                      } else {
+                        await github.rest.packages.deletePackageVersionForUser({
+                          package_type: 'container',
+                          package_name: pkgName,
+                          username: owner,
+                          package_version_id: ver.id
+                        });
+                      }
+                      totalDeleted++;
+                      console.log(`Successfully deleted version ${ver.id} from '${pkgName}'`);
+                    }
+                  }
+                  // If successfully retrieved versions, no need to try other name variations
+                  break;
+                } catch (err) {
+                  if (err.status !== 404) {
+                    console.warn(`Error querying package '${pkgName}': ${err.message}`);
+                  }
                 }
               }
             }
+
+            console.log(`Cleanup complete: deleted ${totalDeleted} image version(s) for PR #${prNumber}.`);
