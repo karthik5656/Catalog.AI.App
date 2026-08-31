@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Catalog.App.Domain/Catalog.App.Domain.csproj" Id="9221bcae-6dbd-43fd-9e37-74aecaef572f" DisplayName="Catalog.App.Domain" />
+  <Project Path="Catalog.App.Infra/Catalog.App.Infra.csproj" Id="e3ad1b24-ca1d-4253-ae12-78f9da62887b" />
+  <Project Path="Catalog.App.Api/Catalog.App.Api.csproj" />
+</Solution>

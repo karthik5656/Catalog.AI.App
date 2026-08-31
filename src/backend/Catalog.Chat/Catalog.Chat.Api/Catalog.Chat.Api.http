@@ -1,0 +1,6 @@
+@Catalog.Chat.Api_HostAddress = https://localhost:7090
+
+GET {{Catalog.Chat.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
