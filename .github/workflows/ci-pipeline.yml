@@ -166,7 +166,12 @@ jobs:
       - name: Set Lowercase Repository Name & Image Tag
         run: |
           REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          IMAGE_TAG="sha-${GITHUB_SHA::7}"
+          PR_NUM="${{ github.event.pull_request.number }}"
+          if [ -n "$PR_NUM" ]; then
+            IMAGE_TAG="pr${PR_NUM}-${GITHUB_SHA::7}"
+          else
+            IMAGE_TAG="sha-${GITHUB_SHA::7}"
+          fi
           if [ "${GITHUB_REF_NAME}" = "main" ] || [ "${GITHUB_REF_NAME}" = "master" ]; then
             IMAGE_TAG="latest"
           fi
