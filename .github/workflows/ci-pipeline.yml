@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - PR Unit Tests & Selective Docker Builds (GHCR)
+name: CI/CD Pipeline - PR Tests & Selective Docker Builds (GHCR)
 
 on:
   pull_request:
@@ -21,20 +21,18 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       # Backend services
-      backend_shared: ${{ steps.filter.outputs.backend_shared }}
       backend_gateway: ${{ steps.filter.outputs.backend_gateway }}
       backend_catalog: ${{ steps.filter.outputs.backend_catalog }}
-      backend_ai_worker: ${{ steps.filter.outputs.backend_ai_worker }}
-      backend_assistant: ${{ steps.filter.outputs.backend_assistant }}
+      backend_chat: ${{ steps.filter.outputs.backend_chat }}
+      backend_rag: ${{ steps.filter.outputs.backend_rag }}
       backend_any: ${{ steps.filter.outputs.backend_any }}
-      
-      # Frontend MFEs
-      frontend_shell: ${{ steps.filter.outputs.frontend_shell }}
-      frontend_catalog_mfe: ${{ steps.filter.outputs.frontend_catalog_mfe }}
-      frontend_copilot_mfe: ${{ steps.filter.outputs.frontend_copilot_mfe }}
-      frontend_assistant_mfe: ${{ steps.filter.outputs.frontend_assistant_mfe }}
+
+      # Frontend apps
+      frontend_catalog: ${{ steps.filter.outputs.frontend_catalog }}
+      frontend_consumer: ${{ steps.filter.outputs.frontend_consumer }}
+      frontend_merchant: ${{ steps.filter.outputs.frontend_merchant }}
       frontend_any: ${{ steps.filter.outputs.frontend_any }}
-      
+
       # Global Docker configs
       docker_global: ${{ steps.filter.outputs.docker_global }}
     steps:
@@ -46,30 +44,22 @@ jobs:
         uses: dorny/paths-filter@v3
         with:
           filters: |
-            backend_shared:
-              - 'src/backend/BuildingBlocks/**'
             backend_gateway:
-              - 'src/backend/Gateway/**'
-              - 'src/backend/BuildingBlocks/**'
+              - 'src/backend/Catalog.Gateway/**'
             backend_catalog:
-              - 'src/backend/CatalogService/**'
-              - 'src/backend/BuildingBlocks/**'
-            backend_ai_worker:
-              - 'src/backend/AIWorkerService/**'
-              - 'src/backend/BuildingBlocks/**'
-            backend_assistant:
-              - 'src/backend/CatalogAssistantService/**'
-              - 'src/backend/BuildingBlocks/**'
+              - 'src/backend/Catalog.App/**'
+            backend_chat:
+              - 'src/backend/Catalog.Chat/**'
+            backend_rag:
+              - 'src/backend/Catalog.Rag/**'
             backend_any:
               - 'src/backend/**'
-            frontend_shell:
-              - 'src/frontend/shell/**'
-            frontend_catalog_mfe:
-              - 'src/frontend/catalog-mfe/**'
-            frontend_copilot_mfe:
-              - 'src/frontend/copilot-mfe/**'
-            frontend_assistant_mfe:
-              - 'src/frontend/catalog-assistant-mfe/**'
+            frontend_catalog:
+              - 'src/frontend/apps/ui-catalog/**'
+            frontend_consumer:
+              - 'src/frontend/apps/ui-catalog-consumer/**'
+            frontend_merchant:
+              - 'src/frontend/apps/ui-catalog-merchant/**'
             frontend_any:
               - 'src/frontend/**'
             docker_global:
@@ -77,13 +67,21 @@ jobs:
               - '.github/workflows/**'
 
   # ---------------------------------------------------------------------------
-  # Step 2: Run .NET 10 Backend Unit Tests (Conditional on PR)
+  # Step 2: Run .NET 10 Backend Tests (Conditional on backend changes)
   # ---------------------------------------------------------------------------
   test-backend:
-    name: Run .NET 10 Backend Unit Tests
+    name: Build & Test .NET 10 Backend
     needs: changes
     if: ${{ needs.changes.outputs.backend_any == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - { name: 'Catalog.Gateway', path: 'src/backend/Catalog.Gateway' }
+          - { name: 'Catalog.App',     path: 'src/backend/Catalog.App' }
+          - { name: 'Catalog.Chat',    path: 'src/backend/Catalog.Chat' }
+          - { name: 'Catalog.Rag',     path: 'src/backend/Catalog.Rag' }
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -94,23 +92,30 @@ jobs:
           dotnet-version: '10.0.x'
           include-prerelease: true
 
-      - name: Restore Backend Dependencies
-        run: dotnet restore src/backend/
+      - name: Restore ${{ matrix.service.name }}
+        run: dotnet restore ${{ matrix.service.path }}
 
-      - name: Build Backend Solution
-        run: dotnet build src/backend/ --no-restore -c Release
+      - name: Build ${{ matrix.service.name }}
+        run: dotnet build ${{ matrix.service.path }} --no-restore -c Release
 
-      - name: Execute .NET 10 Unit Tests
-        run: dotnet test src/backend/ --no-build -c Release --verbosity normal
+      - name: Test ${{ matrix.service.name }}
+        run: dotnet test ${{ matrix.service.path }} --no-build -c Release --verbosity normal
 
   # ---------------------------------------------------------------------------
-  # Step 3: Run React / Frontend Unit Tests (Conditional on PR)
+  # Step 3: Lint & Build Frontend Apps (Conditional on frontend changes)
   # ---------------------------------------------------------------------------
   test-frontend:
-    name: Run Frontend Unit Tests
+    name: Lint & Build Frontend Apps
     needs: changes
     if: ${{ needs.changes.outputs.frontend_any == 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - { name: 'ui-catalog',          path: 'src/frontend/apps/ui-catalog' }
+          - { name: 'ui-catalog-consumer', path: 'src/frontend/apps/ui-catalog-consumer' }
+          - { name: 'ui-catalog-merchant', path: 'src/frontend/apps/ui-catalog-merchant' }
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -119,20 +124,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
-          cache-dependency-path: 'src/frontend/**/package-lock.json'
 
-      - name: Run Frontend Tests
-        run: |
-          for dir in src/frontend/*/; do
-            if [ -f "${dir}package.json" ]; then
-              echo "Testing $dir..."
-              cd "$dir"
-              npm ci
-              npm test -- --watchAll=false || true
-              cd - > /dev/null
-            fi
-          done
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@11.24.0 --activate
+
+      - name: Install Dependencies (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        run: pnpm run lint
+
+      - name: Build (${{ matrix.app.name }})
+        working-directory: ${{ matrix.app.path }}
+        run: pnpm run build
 
   # ---------------------------------------------------------------------------
   # Step 4: Build & Publish Docker Images to GitHub Container Registry (GHCR)
@@ -169,90 +175,87 @@ jobs:
           echo "REPO_LOWER=${REPO_LOWER}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
 
-      # --- 1. Gateway Microservice ---
-      - name: Build & Push Gateway Container
+      # -----------------------------------------------------------------------
+      # Backend Services
+      # -----------------------------------------------------------------------
+
+      # --- 1. Gateway Service ---
+      - name: Build & Push Gateway Service
         if: ${{ needs.changes.outputs.backend_gateway == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/backend/Gateway/Dockerfile
+          file: src/backend/Catalog.Gateway/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/gateway-service:${{ env.IMAGE_TAG }}
 
-      # --- 2. Catalog Microservice ---
-      - name: Build & Push Catalog Microservice Container
+      # --- 2. Catalog Service ---
+      - name: Build & Push Catalog Service
         if: ${{ needs.changes.outputs.backend_catalog == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/backend/CatalogService/Dockerfile
+          file: src/backend/Catalog.App/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-service:${{ env.IMAGE_TAG }}
 
-      # --- 3. AI Worker Microservice ---
-      - name: Build & Push AI Worker Container
-        if: ${{ needs.changes.outputs.backend_ai_worker == 'true' || needs.changes.outputs.docker_global == 'true' }}
+      # --- 3. Chat Service ---
+      - name: Build & Push Chat Service
+        if: ${{ needs.changes.outputs.backend_chat == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/backend/AIWorkerService/Dockerfile
+          file: src/backend/Catalog.Chat/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ai-worker-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/chat-service:${{ env.IMAGE_TAG }}
 
-      # --- 4. Catalog Assistant RAG Microservice ---
-      - name: Build & Push Catalog Assistant Service Container
-        if: ${{ needs.changes.outputs.backend_assistant == 'true' || needs.changes.outputs.docker_global == 'true' }}
+      # --- 4. RAG Service ---
+      - name: Build & Push RAG Service
+        if: ${{ needs.changes.outputs.backend_rag == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: src/backend/CatalogAssistantService/Dockerfile
+          file: src/backend/Catalog.Rag/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-service:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/rag-service:${{ env.IMAGE_TAG }}
 
-      # --- 5. Shell MFE ---
-      - name: Build & Push Shell MFE Container
-        if: ${{ needs.changes.outputs.frontend_shell == 'true' || needs.changes.outputs.docker_global == 'true' }}
+      # -----------------------------------------------------------------------
+      # Frontend Apps
+      # -----------------------------------------------------------------------
+
+      # --- 5. UI Catalog (Host Shell) ---
+      - name: Build & Push UI Catalog
+        if: ${{ needs.changes.outputs.frontend_catalog == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
-          context: ./src/frontend/shell
-          file: src/frontend/shell/Dockerfile
+          context: ./src/frontend/apps/ui-catalog
+          file: src/frontend/apps/ui-catalog/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/shell-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog:${{ env.IMAGE_TAG }}
 
-      # --- 6. Vendor Catalog MFE ---
-      - name: Build & Push Vendor Catalog MFE Container
-        if: ${{ needs.changes.outputs.frontend_catalog_mfe == 'true' || needs.changes.outputs.docker_global == 'true' }}
+      # --- 6. UI Catalog Consumer (Remote MFE) ---
+      - name: Build & Push UI Catalog Consumer
+        if: ${{ needs.changes.outputs.frontend_consumer == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
-          context: ./src/frontend/catalog-mfe
-          file: src/frontend/catalog-mfe/Dockerfile
+          context: ./src/frontend/apps/ui-catalog-consumer
+          file: src/frontend/apps/ui-catalog-consumer/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/vendor-catalog-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-consumer:${{ env.IMAGE_TAG }}
 
-      # --- 7. Copilot MFE ---
-      - name: Build & Push Copilot MFE Container
-        if: ${{ needs.changes.outputs.frontend_copilot_mfe == 'true' || needs.changes.outputs.docker_global == 'true' }}
+      # --- 7. UI Catalog Merchant (Remote MFE) ---
+      - name: Build & Push UI Catalog Merchant
+        if: ${{ needs.changes.outputs.frontend_merchant == 'true' || needs.changes.outputs.docker_global == 'true' }}
         uses: docker/build-push-action@v5
         with:
-          context: ./src/frontend/copilot-mfe
-          file: src/frontend/copilot-mfe/Dockerfile
+          context: ./src/frontend/apps/ui-catalog-merchant
+          file: src/frontend/apps/ui-catalog-merchant/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/copilot-mfe:${{ env.IMAGE_TAG }}
-
-      # --- 8. Catalog Assistant MFE ---
-      - name: Build & Push Catalog Assistant MFE Container
-        if: ${{ needs.changes.outputs.frontend_assistant_mfe == 'true' || needs.changes.outputs.docker_global == 'true' }}
-        uses: docker/build-push-action@v5
-        with:
-          context: ./src/frontend/catalog-assistant-mfe
-          file: src/frontend/catalog-assistant-mfe/Dockerfile
-          push: true
-          tags: |
-            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/catalog-assistant-mfe:${{ env.IMAGE_TAG }}
+            ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/ui-catalog-merchant:${{ env.IMAGE_TAG }}
